@@ -92,7 +92,7 @@
    * [Stay](https://apps.apple.com/qa/app/stay-for-safari/id1591620171) (iOS)
 2. Add the userscript from this repository.
     - copy paste `lesco.user.js`
-    - or use this link to import `https://github.com/ihtshamcodes/lescoBill/lesco.user.js`
+    - or use this link to import `https://raw.githubusercontent.com/ihtshamcodes/lescoBill/main/lesco.user.js`
 3. Set your Consumer IDs and IDsName in the script:
 
     ##### **If `IDsName` are filled:**
@@ -162,3 +162,4 @@ fetch("https://your-webhook.com", {
 </p>
 
 ---
+
