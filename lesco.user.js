@@ -1,23 +1,42 @@
 // ==UserScript==
 // @name         Lesco Bill - User script
-// @version      2026-03-01
+// @version      2026 June, 17 = v2
 // @description  Bypasses the captcha and removes the hassle to remember you consumer ID(s) ones for all. Also it lets you send the fetched data to a database of your liking (n8n, webhook etc). Info that it grabs includes Consumer ID, Bill price, Due date, Bill price after due date, Current and Previous meter readings etc
 // @author       Dr Ihtsham
-// @match        https://www.lesco.gov.pk:36269/Modules/CustomerBillN/CheckBill.asp
-// @match        https://www.lesco.gov.pk:36269/Modules/CustomerBillN/CustomerMenu.asp
-// @match        https://www.lesco.gov.pk:36260/Bill.aspx
-// @icon         https://www.lesco.gov.pk:36269/UIRewamp/new_version/Assets/icons/LESCOLogo%20180x180.png
+// @include        https://www.lesco.gov.pk:36269/Modules/CustomerBillN/CheckBill.asp
+// @include        https://www.lesco.gov.pk:36269/Modules/CustomerBillN/CustomerMenu.asp
+// @include        https://www.lesco.gov.pk:36260/Bill.aspx
+// @include        https://*lesco*
+// @icon         https://dub.lesco.gov.pk:36269/favicon.ico
 // @grant        none
 // ==/UserScript==
+
+
+/*
+----- March 4 2026 =  v1 -----
+First release.
+Had old url which was https://www.lesco.gov.pk:36269/Modules/CustomerBillN/
+Had old design of bill, too
+Old class name for useful items was .ft13
+---- June 17 2026 = v2 ------
+Shifted to new origin: https://dub.lesco.gov.pk:36269/Modules/CustomerBillN/
+Using @include in metadata so as to avoid future conflicts where lesco changes there design/url
+To avoid the captcha/or autofilling, it used to go fetch from static url. So if origin changes, the script starts to give CORS error due to autofilling of captcha is failed. In this version i have used window.location.href to get latest origin and avoid conflicts
+The bill design is updated, therefore i have got to update, how it fetches the bill information from web/html
+New bill design has everything useful in .ft14
+Discarded the use of detailArray, restOfDetails, fourDetails variable and GETTING everything from meterReadingvariable based on new top and left style positions.
+Everyhting is saved into billInfo array as v1
+*/
+
 
 (function () {
   'use strict';
   try {
 
     // Optionally you can also write names of your Bills so you know which bill you are checking. Leave it empty otherwise to not show any names. IDs will be shown instead (default behaviour)
-    let IDsName = []
+    let IDsName = ["", ""]
     // Write your consumer IDs comma seperated below.
-    let yourIDs = [1234567, 8910111]
+    let yourIDs = ["", ""]
     yourIDs.reverse(); IDsName.reverse()
     let id = document.querySelector('input[name="txtCustID"]') ?? "notFound"
     // console.log(id)
@@ -26,12 +45,16 @@
       createButton()
     } else if (id === "notFound" && window.location.href.includes("CustomerMenu.asp")) {
       // not in main page, write pin or captcha
-      fetch('https://www.lesco.gov.pk:36269/Modules/CustomerBillN/codeimage.asp', {
+        // on 17 June 2026, the lesco website got updated and they added dub to their href; hence from now on, extract the href and them send the fetch to the current url to avoid cors err.
+        // old; before 17 june: https://www.lesco.gov.pk:36269/Modules/CustomerBillN/codeimage.asp
+        // new; after 17 june: https://dub.lesco.gov.pk:36269/Modules/CustomerBillN/codeimage.asp
+        let currentOrigin = new URL(window.location.href).origin + "/Modules/CustomerBillN/codeimage.asp"
+      fetch(currentOrigin, {
         "Cookie": document.cookie
       })
         .then(response => response)
         .then(data => {
-          // console.log(data)
+          console.log(data)
           let u = new URL(data.url)
           let code = u.search.match(/(?<=code\=)[\w|\d]{4}/).toString()
           document.querySelector("input[name='code']").value = code;
@@ -45,39 +68,45 @@
     }
 
     if (window.location.href.includes("Bill.aspx")) {
-      let detailArray = Object.values(document.querySelectorAll("p.ft14")).splice(-7)
+        // v1 was .ft14 now in v2 its ft13
+      let detailArray = Object.values(document.querySelectorAll("p.ft13")).splice(-7)
       let fourDetails = detailArray.filter(val => val.textContent.search(/^\d+$/) >= 0).sort((a, b) => a.textContent - b.textContent)
-      let restOfDetails = detailArray.filter(val => val.textContent.search(/^\d+$/) == -1).sort((a, b) => a.textContent - b.textContent)
-      let ft13 = Object.values(document.querySelectorAll(".ft13"))
+      // let restOfDetails = detailArray.filter(val => val.textContent.search(/^\d+$/) == -1).sort((a, b) => a.textContent - b.textContent)
+      // console.log(fourDetails, restOfDetails)
+      // in v1, value inside parenthesis was .ft13 which got updated to .ft14 in v2. No changing variable name because it maybe used somewhere else.
+      let ft13 = Object.values(document.querySelectorAll(".ft14"))
+      // console.log(ft13)
+      // v1 return statment: return node.style.top.search(/(4|5)(1|2|3)\d/) >= 0 && node.style.left.search(/(1|2|3)\d\d/) >= 0 && node.textContent !== ""
       let meterReading = ft13.filter(node => {
-        return node.style.top.search(/(4|5)(1|2|3)\d/) >= 0 && node.style.left.search(/(1|2|3)\d\d/) >= 0 && node.textContent !== ""
+        return node.style.top.search(/(2|3|4)(1|7|3|8|9)\d/) >= 0 && node.style.left.search(/(1|3|5|6|7)\d\d/) >= 0 && node.textContent !== ""
       }).sort((a, b) => a.textContent - b.textContent)
-      // console.log(meterReading)
+      console.log(meterReading)
 
       let billInfo = []
       billInfo.push([
-        ["Bill Month", restOfDetails[0].textContent]
+        ["Bill Month", meterReading[6].textContent]
       ])
       billInfo.push([
-        ["Current Bill", fourDetails[0].textContent + " Rs"]
+        ["Current Bill", meterReading[10].textContent + " Rs"]
       ])
       billInfo.push([
-        ["Due Date", restOfDetails[1].textContent]
+        ["Due Date", meterReading[9].textContent]
       ])
       billInfo.push([
-        ["Bill after due date", fourDetails[1].textContent + " Rs"]
+        ["Bill after due date", meterReading[11]?.textContent + " Rs"]
       ])
       billInfo.push([
-        ["Customer ID", fourDetails[3].textContent]
+        ["Customer ID", Object.values(document.querySelectorAll(".ft14")).filter(function(node){ return node.style.top.includes("242") && node.style.left.includes("60") })[0].textContent
+        ]
       ])
       billInfo.push([
-        ["Current reading", meterReading[3].textContent]
+        ["Current reading", meterReading[4].textContent]
       ])
       billInfo.push([
-        ["Previous reading", meterReading[2].textContent]
+        ["Previous reading", meterReading[3].textContent]
       ])
       billInfo.push([
-        ["Consumed unit", meterReading[1].textContent]
+        ["Consumed unit", meterReading[2].textContent]
       ])
       console.table(billInfo)
       console.log(billInfo)

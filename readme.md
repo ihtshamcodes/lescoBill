@@ -28,7 +28,7 @@
 - [Supported Pages](#supported-pages)
 - [Warnings & Notes](#warnings--notes)
 - [Known bug](#known-bug)
-
+- [Updates history](#updates-history)
 ---
 
 ## Use Cases 
@@ -92,7 +92,7 @@
    * [Stay](https://apps.apple.com/qa/app/stay-for-safari/id1591620171) (iOS)
 2. Add the userscript from this repository.
     - copy paste `lesco.user.js`
-    - or use this link to import `https://raw.githubusercontent.com/ihtshamcodes/lescoBill/main/lesco.user.js`
+    - or use this link to import `https://github.com/ihtshamcodes/lescoBill/lesco.user.js`
 3. Set your Consumer IDs and IDsName in the script:
 
     ##### **If `IDsName` are filled:**
@@ -155,6 +155,26 @@ fetch("https://your-webhook.com", {
 > The official LESCO website displays bill data in tables using various CSS positioning techniques (like absolute, relative, etc.), which makes extracting information challenging. I’ve done my best to capture the relevant data reliably. The script uses a truthy/falsy logic to identify and extract the necessary values.
 
 ---
+## Updates history
+> ----- March 4 2026 =  v1 -----
+
+1. First release.
+2. Had old url which was https://www.lesco.gov.pk:36269/Modules/CustomerBillN/
+3. Had old design of bill, too
+4. Old class name for useful items was .ft13
+
+> ---- June 17 2026 = v2 ------
+
+1. Shifted to new origin: https://dub.lesco.gov.pk:36269/Modules/CustomerBillN/
+2. Using @include in metadata so as to avoid future conflicts where lesco changes there design/url
+3. To avoid the captcha/or autofilling, it used to go fetch from static url. So if origin changes, the script starts to give CORS error due to autofilling of captcha is failed. In this version i have used window.location.href to get latest origin and avoid conflicts
+4. The bill design is updated, therefore i have got to update, how it fetches the bill information from web/html
+5. New bill design has everything useful in .ft14
+6. Discarded the use of detailArray, restOfDetails, fourDetails variable and GETTING everything from meterReadingvariable based on new top and left style positions.
+7. Everyhting is saved into billInfo array as before (v1)
+8. ConsumerID is now extracted using direct code of line and pushed as is in billInfo array
+9. Since we have abandon most variable, every detail is scattered and gathered by truth or false aka guess
+---
 
 <p align="center">
   Made with ❤️ by Dr Ihtsham
@@ -162,4 +182,3 @@ fetch("https://your-webhook.com", {
 </p>
 
 ---
-
