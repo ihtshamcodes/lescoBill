@@ -96,7 +96,7 @@
 3. Set your Consumer IDs and IDsName in the script:
 
     ##### **If `IDsName` are filled:**
-  
+
     ```js
     let IDsName = ["Home", "Shop"]; // Optional
     let yourIDs = [1234567, 8910111];
@@ -174,6 +174,10 @@ fetch("https://your-webhook.com", {
 7. Everyhting is saved into billInfo array as before (v1)
 8. ConsumerID is now extracted using direct code of line and pushed as is in billInfo array
 9. Since we have abandon most variable, every detail is scattered and gathered by truth or false aka guess
+
+> ---- June 26, 2026 = v3 ----
+1. In this version IDsName and yourIDs are saved in localStorage to restore automatically in case of any userscript update. In older versions, updating userscripts looses the meter name and ids.
+2. There used to be no variable for webhook, only direct fetch calls were made. Now there is a variable which is stored in localStorage as well to restore it automatically.
 ---
 
 <p align="center">

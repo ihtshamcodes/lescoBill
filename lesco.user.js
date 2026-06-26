@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Lesco Bill - User script
-// @version      2026 June, 17 = v2
+// @version      v3
 // @description  Bypasses the captcha and removes the hassle to remember you consumer ID(s) ones for all. Also it lets you send the fetched data to a database of your liking (n8n, webhook etc). Info that it grabs includes Consumer ID, Bill price, Due date, Bill price after due date, Current and Previous meter readings etc
 // @author       Dr Ihtsham
 // @include        https://www.lesco.gov.pk:36269/Modules/CustomerBillN/CheckBill.asp
@@ -26,6 +26,9 @@ The bill design is updated, therefore i have got to update, how it fetches the b
 New bill design has everything useful in .ft14
 Discarded the use of detailArray, restOfDetails, fourDetails variable and GETTING everything from meterReadingvariable based on new top and left style positions.
 Everyhting is saved into billInfo array as v1
+---- June 26, 2026 = v3 -----
+1. In this version IDsName and yourIDs are saved in localStorage to restore automatically in case of any userscript update. In older versions, updating userscripts looses the meter name and ids.
+2. There used to be no variable for webhook, only direct fetch calls were made. Now there is a variable which is stored in localStorage as well to restore it automatically.
 */
 
 
@@ -34,10 +37,19 @@ Everyhting is saved into billInfo array as v1
   try {
 
     // Optionally you can also write names of your Bills so you know which bill you are checking. Leave it empty otherwise to not show any names. IDs will be shown instead (default behaviour)
-    let IDsName = ["", ""]
+    let IDsName = []
     // Write your consumer IDs comma seperated below.
-    let yourIDs = ["", ""]
+    let yourIDs = []
     yourIDs.reverse(); IDsName.reverse()
+    // pushing data to IDsName and yourIDs respectively if db exist in localStorage; v3
+      let db = JSON.parse(window.localStorage.getItem("db"))
+      if(db){
+          IDsName = Array.from(db[0])
+          yourIDs = Array.from(db[1])
+          // console.log(db)
+      }
+     // saving data v3
+     window.localStorage.setItem("db", JSON.stringify([IDsName, yourIDs]))
     let id = document.querySelector('input[name="txtCustID"]') ?? "notFound"
     // console.log(id)
 
@@ -113,7 +125,12 @@ Everyhting is saved into billInfo array as v1
       showDataInTable(billInfo)
 
       // billInfo variable contains the final end data that can then be transferred to the database of your liking
-      // fetch()
+      // v3 webhookURL (optional)
+        let webhookURL = ``
+        if (webhookURL) window.localStorage.setItem("webhookURL", webhookURL)
+        else webhookURL = window.localStorage.getItem("webhookURL")
+        // fetch(webhookURL)
+
     }
 
 
