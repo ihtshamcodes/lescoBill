@@ -46,12 +46,12 @@ Everyhting is saved into billInfo array as v1
     // pushing data to IDsName and yourIDs respectively if db exist in localStorage; v3
       let db = JSON.parse(window.localStorage.getItem("db"))
       if(db){
-          IDsName = Array.from(db[0])
-          yourIDs = Array.from(db[1])
+        IDsName = [...new Set([...IDsName, ...db[0]])];
+        yourIDs = [...new Set([...yourIDs, ...db[1]])];
           // console.log(db)
       }
      // saving data v3
-     window.localStorage.setItem("db", JSON.stringify([IDsName, yourIDs]))
+     if(yourIDs.length > 0) window.localStorage.setItem("db", JSON.stringify([IDsName, yourIDs]))
     let id = document.querySelector('input[name="txtCustID"]') ?? "notFound"
     // console.log(id)
 
