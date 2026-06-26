@@ -92,7 +92,10 @@
    * [Stay](https://apps.apple.com/qa/app/stay-for-safari/id1591620171) (iOS)
 2. Add the userscript from this repository.
     - copy paste `lesco.user.js`
-    - or use this link to import `https://raw.githubusercontent.com/ihtshamcodes/lescoBill/main/lesco.user.js`
+    - or use this link to import 
+    ```text
+    https://raw.githubusercontent.com/ihtshamcodes/lescoBill/main/lesco.user.js
+    ```
 3. Set your Consumer IDs and IDsName in the script:
 
     ##### **If `IDsName` are filled:**
@@ -178,6 +181,8 @@ fetch("https://your-webhook.com", {
 > ---- June 26, 2026 = v3 ----
 1. In this version IDsName and yourIDs are saved in localStorage to restore automatically in case of any userscript update. In older versions, updating userscripts looses the meter name and ids.
 2. There used to be no variable for webhook, only direct fetch calls were made. Now there is a variable which is stored in localStorage as well to restore it automatically.
+3. Concatenated fetch(webhookURL) with ?data=${billInfo}. webhookURL automatically grabs url from localStorage (if exist) and saves few click of user where he had to repeatedly write his webhook to send data wherever he likes after an update (of userscript)
+4. ⚠ Only sends data if webhookURL has a link
 ---
 
 <p align="center">

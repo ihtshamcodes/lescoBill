@@ -7,7 +7,7 @@
 // @include        https://www.lesco.gov.pk:36269/Modules/CustomerBillN/CustomerMenu.asp
 // @include        https://www.lesco.gov.pk:36260/Bill.aspx
 // @include        https://*lesco*
-// @icon         https://dub.lesco.gov.pk:36269/favicon.ico
+// @icon         https://raw.githubusercontent.com/ihtshamcodes/lescoBill/refs/heads/main/assets/lescoImg.jpg
 // @grant        none
 // ==/UserScript==
 
@@ -29,6 +29,8 @@ Everyhting is saved into billInfo array as v1
 ---- June 26, 2026 = v3 -----
 1. In this version IDsName and yourIDs are saved in localStorage to restore automatically in case of any userscript update. In older versions, updating userscripts looses the meter name and ids.
 2. There used to be no variable for webhook, only direct fetch calls were made. Now there is a variable which is stored in localStorage as well to restore it automatically.
+3. Concatenated fetch(webhookURL) with ?data=${billInfo}. webhookURL automatically grabs url from localStorage (if exist) and saves few click of user where he had to repeatedly write his webhook to send data wherever he likes after an update (of userscript)
+4. ⚠ Only sends data if webhookURL has a link
 */
 
 
@@ -129,8 +131,9 @@ Everyhting is saved into billInfo array as v1
         let webhookURL = ``
         if (webhookURL) window.localStorage.setItem("webhookURL", webhookURL)
         else webhookURL = window.localStorage.getItem("webhookURL")
-        // fetch(webhookURL)
-
+        
+        if(webhookURL) fetch(webhookURL+`?data=${billInfo}`)
+ 
     }
 
 
