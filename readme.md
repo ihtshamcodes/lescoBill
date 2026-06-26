@@ -183,6 +183,8 @@ fetch("https://your-webhook.com", {
 2. There used to be no variable for webhook, only direct fetch calls were made. Now there is a variable which is stored in localStorage as well to restore it automatically.
 3. Concatenated fetch(webhookURL) with ?data=${billInfo}. webhookURL automatically grabs url from localStorage (if exist) and saves few click of user where he had to repeatedly write his webhook to send data wherever he likes after an update (of userscript)
 4. ⚠ Only sends data if webhookURL has a link
+5. Added cross-sign to delete saved IDsName and yourIDs from localStorage. If the variable are kept filled manually by the same value as in localStorage db, deletion will have no effect as the reload will again save the values in db.
+
 ---
 
 <p align="center">
