@@ -31,6 +31,7 @@ Everyhting is saved into billInfo array as v1
 2. There used to be no variable for webhook, only direct fetch calls were made. Now there is a variable which is stored in localStorage as well to restore it automatically.
 3. Concatenated fetch(webhookURL) with ?data=${billInfo}. webhookURL automatically grabs url from localStorage (if exist) and saves few click of user where he had to repeatedly write his webhook to send data wherever he likes after an update (of userscript)
 4. ⚠ Only sends data if webhookURL has a link
+5. Added cross-sign to delete saved IDsName and yourIDs from localStorage. If the variable are kept filled manually by the same value as in localStorage db, deletion will have no effect as the reload will again save the values in db.
 */
 
 
@@ -131,9 +132,9 @@ Everyhting is saved into billInfo array as v1
         let webhookURL = ``
         if (webhookURL) window.localStorage.setItem("webhookURL", webhookURL)
         else webhookURL = window.localStorage.getItem("webhookURL")
-        
+
         if(webhookURL) fetch(webhookURL+`?data=${billInfo}`)
- 
+
     }
 
 
@@ -142,7 +143,14 @@ Everyhting is saved into billInfo array as v1
       // throwing styles
       let s = document.createElement("style")
       s.textContent = `
-        .metersIDs {
+
+       /* v3 */
+       .meterIdContainer{
+        display: flex;
+        align-items: center;
+        }
+
+        .metersIDs, .cross-sign {
         cursor: pointer;
         border-radius: 5%;
         background: rgba(255, 255, 255, 0.2);
@@ -156,7 +164,14 @@ Everyhting is saved into billInfo array as v1
         padding: 5px;
         margin: 5px;
         float: left;
+        }
+
+        .metersIDs {
         width: 100px;
+        }
+
+        .cross-sign {
+        background: #CD5C5C;
         }
 
         .userScript {
@@ -180,12 +195,22 @@ Everyhting is saved into billInfo array as v1
 
 
 
-      yourIDs.forEach((val, index) => {
+
+       yourIDs.forEach((val, index) => {
+
         let name = val
         if (IDsName.length > 0) name = IDsName[index]
-        userScriptDiv.insertAdjacentHTML("afterbegin", `
+           // creating meterID container = v3
+           let eachMeterIDContainerDiv = document.createElement("div")
+           eachMeterIDContainerDiv.className = "meterIdContainer";
+           userScriptDiv.append(eachMeterIDContainerDiv)
+
+           eachMeterIDContainerDiv.insertAdjacentHTML("afterbegin", `
         <div class="metersIDs" data-id=${val}>${name}</div>
+        <span class="cross-sign" data-id=${val} data-name=${name}>X</span>
 `)
+
+
 
         document.addEventListener("click", function (e) {
           if (e.target.className.includes("metersIDs")) {
@@ -193,7 +218,28 @@ Everyhting is saved into billInfo array as v1
             let btn2 = document.querySelector("form[name='form2']").querySelector("input[type='submit']")
             btn2.click()
           }
+
+            /* v3 */
+          if(e.target.className.includes("cross-sign")){
+
+              let db = JSON.parse(localStorage.getItem("db"));
+              let names = db[0];
+              let ids = db[1];
+              const index = names.indexOf(e.target.dataset.name);
+              if (index !== -1) {
+                  names.splice(index, 1);
+                  ids.splice(index, 1);
+                  localStorage.setItem("db", JSON.stringify([names, ids]));
+                  alert(`localStorage have been updated`)
+                  window.location.reload()
+              }
+
+          }
+            /* v3 */
+
         })
+
+
 
 
 

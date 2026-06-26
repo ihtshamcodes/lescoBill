@@ -105,7 +105,7 @@
     let yourIDs = [1234567, 8910111];
     ```
 
-    <center><img src="assets/preview-with-names.png"/></center>
+    <center><img src="assets/v3-preview-with-names.png"/></center>
 
     ##### **If `IDsName` are left empty:**
     ```js
@@ -114,7 +114,7 @@
     ```
 
 
-    <center><img src="assets/preview-without-names.png"/></center>
+    <center><img src="assets/v3-review-without-names.png"/></center>
 
 
 ---
